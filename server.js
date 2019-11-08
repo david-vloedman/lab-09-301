@@ -32,6 +32,15 @@ function Location(query, data) {
   this.longitude = data.geometry.location.lng;
 }
 
+function Restaurant(data) {
+  this.name = data.name;
+  this.rating = data.rating;
+  this.price = data.price;
+  this.url = data.url;
+  this.image_url = data.image_url;
+  this.created_at = Date.now();
+}
+
 function Movie(movie) {
   this.title = movie.title;
   this.overview = movie.overview;
@@ -91,11 +100,22 @@ Location.lookup = handler => {
     .catch(console.error);
 };
 
+Restaurant.fetch = (location, response) => {
+  const url = `https://api.yelp.com/v3/businesses/search?location=${location.search_query}`;
+  return superagent
+    .get(url)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+    .then(result => {
+      response.send(result.body.businesses.map(bus => new Restaurant(bus)));
+    });
+};
+
 // API Routes
 
 app.get('/location', getLocation);
 app.get('/weather', getWeather);
 app.get('/movies', getMovies);
+app.get('/yelp', getYelp);
 
 //Route Handlers
 
@@ -106,14 +126,30 @@ function getMovies(request, response) {
     .get(url)
     .then(data => {
       const movies = data.body.results.map(movie => {
-        const newMovie = new Movie(movie);
-        return newMovie;
+        return new Movie(movie);
       });
       response.status(200).json(movies);
     })
     .catch(() => {
-      errorHandler('So, so, so, sorry. omething went wrong', request, response);
+      errorHandler(
+        'So, so, so, sorry. Something went wrong',
+        request,
+        response
+      );
     });
+}
+
+function getYelp(request, response) {
+  // const restrauntHandler = {
+  //   query: request.query.data,
+
+  //   cacheHit: results => {
+
+  //   },
+
+  //   cacheMiss: () =>
+  // };
+  Restaurant.fetch(request.query.data, response);
 }
 
 function getLocation(request, response) {
@@ -121,12 +157,10 @@ function getLocation(request, response) {
     query: request.query.data,
 
     cacheHit: results => {
-      console.log('Got data from DB');
       response.send(results.rows[0]);
     },
 
     cacheMiss: () => {
-      console.log('No data in DB, fetching...');
       Location.fetchLocation(request.query.data).then(data =>
         response.send(data)
       );

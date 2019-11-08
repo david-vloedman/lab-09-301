@@ -21,4 +21,14 @@ CREATE TABLE movies (
     location_id INTEGER NOT NULL REFERENCES locations(id)
 );
 
+CREATE TABLE restraunts (
+  id SERIAL PRIMARY KEY,
+  restraunt VARCHAR (255),
+  page_url VARCHAR(255),
+  price VARCHAR(255),
+  rating REAL,
+  img_url VARCHAR(255),
+  location_id INTEGER NOT NULL REFERENCES locations(id)
+)
+
 
