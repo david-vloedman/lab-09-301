@@ -1,6 +1,6 @@
 # Code 301 Lab 08 - Persistence with a SQL database
 
-**Author**: David Vloedman and Holly Davis
+**Author**: David Vloedman
 **Version**: 1.0.0
 <!-- (increment the patch/fix version number if you make more commits past your first submission) -->
 
@@ -47,21 +47,21 @@ This is a Node.js server that uses express, dotenv, and cors packages. The serve
 <!-- Give credit (and a link) to other people or resources that helped you build this application. -->
 
 
-Number and name of feature: Feature #1 Database  
-Estimate of time needed to complete:  
-Start time:  
-Finish time:  
-Actual time needed to complete:  
+Number and name of feature: Feature #1  Movies
+Estimate of time needed to complete:  hour
+Start time:  8:00 AM
+Finish time:  10:00 AM
+Actual time needed to complete:  2 hours
 
-Number and name of feature: Feature #2 Server  
-Estimate of time needed to complete:  
-Start time:  
-Finish time:  
-Actual time needed to complete:  
+Number and name of feature: Feature #2 Yelp 
+Estimate of time needed to complete:  hour
+Start time:  10:30AM
+Finish time:  2:00 PM
+Actual time needed to complete:   3.5 hours
 
 
 Number and name of feature: Feature #3 Deploy  
-Estimate of time needed to complete:  
+Estimate of time needed to complete:  10 
 Start time:  
 Finish time:  
 Actual time needed to complete:  
