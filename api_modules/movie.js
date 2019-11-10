@@ -1,3 +1,7 @@
+'using strict';
+
+const superagent = require('superagent');
+
 function Movie(movie) {
   this.title = movie.title;
   this.overview = movie.overview;

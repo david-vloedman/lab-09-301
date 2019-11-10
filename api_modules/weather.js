@@ -1,4 +1,5 @@
 'using strict';
+const superagent = require('superagent');
 
 function Weather(day) {
   this.forecast = day.summary;

@@ -1,6 +1,10 @@
 'using strict';
 
 const superagent = require('superagent');
+const pg = require('pg');
+const client = new pg.Client(process.env.DATABASE_URL);
+client.connect();
+client.on('err', err => console.error(err));
 
 function Location(query, data) {
   this.search_query = query;
