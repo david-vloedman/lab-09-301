@@ -1,34 +1,48 @@
-DROP TABLE IF EXISTS locations, movies;
+DROP TABLE IF EXISTS weathers;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS movies;
+DROP TABLE IF EXISTS restaurants;
+DROP TABLE IF EXISTS locations;
 
 CREATE TABLE locations (
-    id SERIAL PRIMARY KEY,
-    search_query VARCHAR(255),
-    formatted_query VARCHAR(255),
-    latitude NUMERIC(10, 7),
-    longitude NUMERIC(10, 7)
-  );
-
-CREATE TABLE movies (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR (255),
-    overview VARCHAR (1000),
-    average_votes REAL,
-    total_votes INTEGER,
-    image_url VARCHAR (255),
-    popularity NUMERIC (6, 4),
-    released_on CHAR (10),
-    created_at CHAR (10),
-    location_id INTEGER NOT NULL REFERENCES locations(id)
+  id SERIAL PRIMARY KEY,
+  search_query VARCHAR(255),
+  formatted_query VARCHAR(255),
+  latitude NUMERIC(10, 7),
+  longitude NUMERIC(10, 7)
 );
 
-CREATE TABLE restraunts (
+CREATE TABLE weathers (
   id SERIAL PRIMARY KEY,
-  restraunt VARCHAR (255),
-  page_url VARCHAR(255),
-  price VARCHAR(255),
-  rating REAL,
-  img_url VARCHAR(255),
-  location_id INTEGER NOT NULL REFERENCES locations(id)
-)
+  forecast VARCHAR(255),
+  time VARCHAR(255),
+  created_at BIGINT,
+  location_id INTEGER NOT NULL,
+  FOREIGN KEY (location_id) REFERENCES locations (id)
+);
 
+CREATE TABLE movies (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255),
+  overview TEXT,
+  average_votes REAL,
+  total_votes VARCHAR(255),
+  image_url TEXT,
+  popularity VARCHAR(255),
+  released_on VARCHAR(255),
+  created_at BIGINT,
+  location_id INTEGER NOT NULL,
+  FOREIGN KEY (location_id) REFERENCES locations (id)
+);
 
+CREATE TABLE restaurants (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255),
+  rating NUMERIC(4, 2),
+  price VARCHAR(50),
+  url TEXT,
+  image_url TEXT,
+  created_at BIGINT,
+  location_id INTEGER NOT NULL,
+  FOREIGN KEY (location_id) REFERENCES locations (id)
+);
