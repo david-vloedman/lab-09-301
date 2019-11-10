@@ -4,6 +4,7 @@ const superagent = require('superagent');
 function Weather(day) {
   this.forecast = day.summary;
   this.time = new Date(day.time * 1000).toDateString();
+  this.created_at = Date.now();
 }
 
 function getWeather(request, response) {
