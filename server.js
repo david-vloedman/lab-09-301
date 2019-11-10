@@ -100,22 +100,14 @@ Location.lookup = handler => {
     .catch(console.error);
 };
 
-Restaurant.fetch = (location, response) => {
-  const url = `https://api.yelp.com/v3/businesses/search?location=${location.search_query}`;
-  return superagent
-    .get(url)
-    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
-    .then(result => {
-      response.send(result.body.businesses.map(bus => new Restaurant(bus)));
-    });
-};
+Restaurant.fetch = (location, response) => {};
 
 // API Routes
 
 app.get('/location', getLocation);
 app.get('/weather', getWeather);
 app.get('/movies', getMovies);
-app.get('/yelp', getYelp);
+app.get('/yelp', getRestraunt);
 
 //Route Handlers
 
@@ -139,17 +131,14 @@ function getMovies(request, response) {
     });
 }
 
-function getYelp(request, response) {
-  // const restrauntHandler = {
-  //   query: request.query.data,
-
-  //   cacheHit: results => {
-
-  //   },
-
-  //   cacheMiss: () =>
-  // };
-  Restaurant.fetch(request.query.data, response);
+function getRestraunt(request, response) {
+  const url = `https://api.yelp.com/v3/businesses/search?location=${request.formatted_query}`;
+  return superagent
+    .get(url)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+    .then(result => {
+      response.send(result.body.businesses.map(bus => new Restaurant(bus)));
+    });
 }
 
 function getLocation(request, response) {
