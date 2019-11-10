@@ -52,10 +52,11 @@ Restaurant.fetch = request => {
 function getRestaurant(request, response) {
   const restrauntHandler = {
     location: request.query.data.id,
-    cacheHit: results => response.send(results.rows),
+    cacheHit: results => {
+      response.send(results.rows);
+    },
     cacheMiss: () => {
       const restaurants = Restaurant.fetch(request);
-
       response.status(200).json(restaurants);
     }
   };
