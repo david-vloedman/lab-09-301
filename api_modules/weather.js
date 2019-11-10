@@ -19,3 +19,5 @@ function getWeather(request, response) {
       errorHandler('So sorry, something went really wrong', request, response);
     });
 }
+
+module.exports = getWeather;

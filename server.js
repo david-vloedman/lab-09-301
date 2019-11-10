@@ -3,6 +3,9 @@
 require('dotenv').config();
 
 //Dependencies and setup
+const getMovie = require('./api_modules/movie.js');
+const getLocation = require('./api_modules/location');
+const getWeather = require('./api_modules/weather.js');
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
@@ -25,12 +28,6 @@ function errorHandler(error, request, response) {
 }
 
 //Constructor Functions
-function Location(query, data) {
-  this.search_query = query;
-  this.formatted_query = data.formatted_address;
-  this.latitude = data.geometry.location.lat;
-  this.longitude = data.geometry.location.lng;
-}
 
 function Restaurant(data) {
   this.name = data.name;
@@ -41,64 +38,9 @@ function Restaurant(data) {
   this.created_at = Date.now();
 }
 
-function Movie(movie) {
-  this.title = movie.title;
-  this.overview = movie.overview;
-  this.average_votes = movie.vote_average;
-  this.total_votes = movie.vote_count;
-  this.image_url = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
-  this.popularity = movie.popularity;
-  this.released_on = movie.release_date;
-}
-
-function Weather(day) {
-  this.forecast = day.summary;
-  this.time = new Date(day.time * 1000).toDateString();
-}
-
 //Define a prototype function to save data to DB
-Location.prototype.save = function() {
-  const SQL = `INSERT INTO locations
-  (search_query, formatted_query, latitude, longitude)
-  VALUES ($1, $2, $3, $4)
-  RETURNING *`;
-
-  let values = Object.values(this);
-  return client.query(SQL, values);
-};
 
 //My Static Constructor Functions
-
-Location.fetchLocation = function(query) {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${process.env.GEOCODE_API_KEY}`;
-
-  return superagent.get(url).then(result => {
-    if (!result.body.results.length) {
-      throw 'No data';
-    }
-    let location = new Location(query, result.body.results[0]);
-    return location.save().then(result => {
-      location.id = result.rows[0].id; //update, delete...etc...
-      return location;
-    });
-  });
-};
-
-Location.lookup = handler => {
-  const SQL = `SELECT * FROM locations WHERE search_query=$1`;
-  const values = [handler.query];
-
-  return client
-    .query(SQL, values)
-    .then(results => {
-      if (results.rowCount > 0) {
-        handler.cacheHit(results);
-      } else {
-        handler.cacheMiss();
-      }
-    })
-    .catch(console.error);
-};
 
 Restaurant.fetch = (location, response) => {};
 
@@ -106,30 +48,10 @@ Restaurant.fetch = (location, response) => {};
 
 app.get('/location', getLocation);
 app.get('/weather', getWeather);
-app.get('/movies', getMovies);
+app.get('/movies', getMovie);
 app.get('/yelp', getRestraunt);
 
 //Route Handlers
-
-function getMovies(request, response) {
-  const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&language=en-US&page=1&include_adult=false&query=${request.query.data.search_query}`;
-
-  superagent
-    .get(url)
-    .then(data => {
-      const movies = data.body.results.map(movie => {
-        return new Movie(movie);
-      });
-      response.status(200).json(movies);
-    })
-    .catch(() => {
-      errorHandler(
-        'So, so, so, sorry. Something went wrong',
-        request,
-        response
-      );
-    });
-}
 
 function getRestraunt(request, response) {
   const url = `https://api.yelp.com/v3/businesses/search?location=${request.formatted_query}`;
@@ -138,38 +60,6 @@ function getRestraunt(request, response) {
     .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
     .then(result => {
       response.send(result.body.businesses.map(bus => new Restaurant(bus)));
-    });
-}
-
-function getLocation(request, response) {
-  const locationHandler = {
-    query: request.query.data,
-
-    cacheHit: results => {
-      response.send(results.rows[0]);
-    },
-
-    cacheMiss: () => {
-      Location.fetchLocation(request.query.data).then(data =>
-        response.send(data)
-      );
-    }
-  };
-  Location.lookup(locationHandler);
-}
-
-function getWeather(request, response) {
-  const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.query.data.latitude},${request.query.data.longitude}`;
-  superagent
-    .get(url)
-    .then(data => {
-      const weatherSummaries = data.body.daily.data.map(day => {
-        return new Weather(day);
-      });
-      response.status(200).json(weatherSummaries);
-    })
-    .catch(() => {
-      errorHandler('So sorry, something went really wrong', request, response);
     });
 }
 
