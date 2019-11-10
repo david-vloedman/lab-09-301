@@ -58,9 +58,7 @@ function getLocation(request, response) {
   const locationHandler = {
     query: request.query.data,
 
-    cacheHit: results => {
-      response.send(results.rows[0]);
-    },
+    cacheHit: results => response.send(results.rows[0]),
 
     cacheMiss: () => {
       Location.fetchLocation(request.query.data).then(data =>
