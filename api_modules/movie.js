@@ -15,7 +15,6 @@ function Movie(movie, id) {
   this.popularity = movie.popularity;
   this.released_on = movie.release_date;
   this.created_at = Date.now();
-
   this.location_id = id;
 }
 
@@ -24,7 +23,7 @@ Movie.prototype.save = function() {
   return client.query(SQL, Object.values(this));
 };
 
-Movie.fetchMovies = query => {
+Movie.fetch = query => {
   const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&language=en-US&page=1&include_adult=false&query=${query.data.search_query}`;
 
   superagent
@@ -54,20 +53,14 @@ Movie.lookup = handler => {
 function getMovies(request, response) {
   const movieHandler = {
     location: request.query.data.id,
-
     cacheHit: results => {
-      console.log(results);
       response.send(results.rows);
     },
-
     cacheMiss: () => {
-      console.log('at cache miss');
-      const movies = Movie.fetchMovies(request.query);
-
+      const movies = Movie.fetch(request.query);
       response.status(200).json(movies);
     }
   };
-
   Movie.lookup(movieHandler);
 }
 
